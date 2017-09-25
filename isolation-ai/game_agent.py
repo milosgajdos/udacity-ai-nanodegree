@@ -217,21 +217,14 @@ class MinimaxPlayer(IsolationPlayer):
         if len(legal_moves) == 0:
             return (-1, -1)
 
-        # initialize default values
-        val_func, cmp_func = None, None
-        best_score, best_move = None, game.get_player_location(self)
-        # init values based on order of play
-        if game.active_player == self:
-            # if active player, then maximize min
-            val_func, cmp_func, best_score = self.min_value, max, float("-inf")
-        else:
-            # otherwise minimize max
-            val_func, cmp_func, best_score = self.max_value, min, float("inf")
-
+        # assume the worst outcome and take a random first legal move
+        best_score = float("-inf")
+        # initialize the best move to randomly selected legal_move
+        best_move = legal_moves[random.randint(0, len(legal_moves)) - 1]
         # find the best moves between all legal moves
         for m in legal_moves:
-            v = val_func(game.forecast_move(m), depth-1)
-            if cmp_func(v, best_score) == v:
+            v = self.min_value(game.forecast_move(m), depth-1)
+            if v > best_score:
                 best_score = v
                 best_move = m
 
@@ -371,5 +364,61 @@ class AlphaBetaPlayer(IsolationPlayer):
         if self.time_left() < self.TIMER_THRESHOLD:
             raise SearchTimeout()
 
-        # TODO: finish this function!
-        raise NotImplementedError
+        # if there are no legal moves return (-1,-1)
+        legal_moves = game.get_legal_moves()
+        if len(legal_moves) == 0:
+            return (-1, -1)
+        # assume the worst outcome and take a random first legal move
+        best_score = float("-inf")
+        # initialize best_move to randomly selected legal_move
+        best_move = legal_moves[random.randint(0, len(legal_moves)) - 1]
+        # find the best score for the next move and update alpha
+        for m in legal_moves:
+            v = self.min_value(game.forecast_move(m), depth-1, alpha, beta)
+            if v > best_score:
+                best_score = v
+                best_move = m
+            alpha = max(alpha, best_score)
+
+        return best_move
+
+    def terminal_test(self, game):
+        return not bool(game.get_legal_moves())
+
+    def min_value(self, game, depth, alpha, beta):
+        # timeout expeirec
+        if self.time_left() < self.TIMER_THRESHOLD:
+            raise SearchTimeout()
+        # we reached max depth
+        if depth == 0:
+            return self.score(game, self)
+        # if terminal state, return player utility
+        if self.terminal_test(game):
+            return game.utility(self)
+        # initialize value to worse score for MIN node
+        v = float("inf")
+        for m in game.get_legal_moves():
+            v = min(v, self.max_value(game.forecast_move(m), depth-1, alpha, beta))
+            if v <= alpha:
+                return v
+            beta = min(beta, v)
+        return v
+
+    def max_value(self, game, depth, alpha, beta):
+        # timeout expeirec
+        if self.time_left() < self.TIMER_THRESHOLD:
+            raise SearchTimeout()
+        # we reached max depth
+        if depth == 0:
+            return self.score(game, self)
+        # if terminal state, return player utility
+        if self.terminal_test(game):
+            return game.utility(self)
+        # initialize value to worse score for MAX node
+        v = float("-inf")
+        for m in game.get_legal_moves():
+            v = max(v, self.min_value(game.forecast_move(m), depth-1, alpha, beta))
+            if v >= beta:
+                return v
+            alpha = max(alpha, v)
+        return v

@@ -3,6 +3,7 @@ test your agent's strength against a set of known agents using tournament.py
 and include the results in your report.
 """
 import random
+import math
 
 
 class SearchTimeout(Exception):
@@ -34,8 +35,20 @@ def custom_score(game, player):
     float
         The heuristic value of the current game state to the specified player.
     """
-    # TODO: finish this function!
-    raise NotImplementedError
+
+    # return if you won or lost
+    if game.is_loser(player):
+        return float("-inf")
+    if game.is_winner(player):
+        return float("inf")
+
+    player_location = game.get_player_location(player)
+    opponent_location = game.get_player_location(game.get_opponent(player))
+    distance = float(math.sqrt((player_location[0] - opponent_location[0]) ** 2 +
+                               (player_location[1] - opponent_location[1]) ** 2))
+
+
+    return 100*float(distance) + float(len(game.get_blank_spaces()))
 
 
 def custom_score_2(game, player):
@@ -60,9 +73,40 @@ def custom_score_2(game, player):
     float
         The heuristic value of the current game state to the specified player.
     """
-    # TODO: finish this function!
-    raise NotImplementedError
+    # return if you won or lost
+    if game.is_loser(player):
+        return float("-inf")
+    if game.is_winner(player):
+        return float("inf")
 
+    player_legal_moves = game.get_legal_moves(player)
+    opponent_legal_moves = game.get_legal_moves(game.get_opponent(player))
+    player_moves = len(player_legal_moves)
+    opponent_moves = len(opponent_legal_moves)
+
+    # detect game board edges
+    edges = []
+    rays = [(1, 0), (0, 1), (-1, 0), (0, -1)]
+    location = (0, 0)
+
+    for dx, dy in rays:
+        _x, _y = location
+        while 0 <= _x + dx < game.width and 0 <= _y + dy < game.height:
+            _x, _y = _x + dx, _y + dy
+            location = (_x, _y)
+            edges.append(location)
+
+    w1 = 1
+    for m in player_legal_moves:
+        if m not in edges:
+            w1 += 1
+
+    w2 = 1
+    for m in opponent_legal_moves:
+        if m not in edges:
+            w2 += 1
+
+    return float(w1*player_moves - w2*opponent_moves)
 
 def custom_score_3(game, player):
     """Calculate the heuristic value of a game state from the point of view
@@ -86,9 +130,16 @@ def custom_score_3(game, player):
     float
         The heuristic value of the current game state to the specified player.
     """
-    # TODO: finish this function!
-    raise NotImplementedError
+    # return if you won or lost
+    if game.is_loser(player):
+        return float("-inf")
+    if game.is_winner(player):
+        return float("inf")
 
+    player_moves = len(game.get_legal_moves(player))
+    opponent_moves = len(game.get_legal_moves(game.get_opponent(player)))
+
+    return float(player_moves - opponent_moves)
 
 class IsolationPlayer:
     """Base class for minimax and alphabeta agents -- this class is never
@@ -243,12 +294,9 @@ class MinimaxPlayer(IsolationPlayer):
         """
         if self.time_left() < self.TIMER_THRESHOLD:
             raise SearchTimeout()
-        # we reached max depth
-        if depth == 0:
+        # we reached max depth or terminal state
+        if depth == 0 or self.terminal_test(game):
             return self.score(game, self)
-        # if terminal state, return player utility
-        if self.terminal_test(game):
-            return game.utility(self)
         # initialize value to worse score for MIN node
         v = float("inf")
         for m in game.get_legal_moves():
@@ -263,12 +311,9 @@ class MinimaxPlayer(IsolationPlayer):
         """
         if self.time_left() < self.TIMER_THRESHOLD:
             raise SearchTimeout()
-        # we reached max depth
-        if depth == 0:
+        # we reached max depth or terminal state
+        if depth == 0 or self.terminal_test(game):
             return self.score(game, self)
-        # if terminal state, return player utility
-        if self.terminal_test(game):
-            return game.utility(self)
         # initialize value to worse score for MAX node
         v = float("-inf")
         for m in game.get_legal_moves():
@@ -400,12 +445,9 @@ class AlphaBetaPlayer(IsolationPlayer):
         # timeout expeirec
         if self.time_left() < self.TIMER_THRESHOLD:
             raise SearchTimeout()
-        # we reached max depth
-        if depth == 0:
+        # we reached max depth or terminal state
+        if depth == 0 or self.terminal_test(game):
             return self.score(game, self)
-        # if terminal state, return player utility
-        if self.terminal_test(game):
-            return game.utility(self)
         # initialize value to worse score for MIN node
         v = float("inf")
         for m in game.get_legal_moves():
@@ -419,12 +461,9 @@ class AlphaBetaPlayer(IsolationPlayer):
         # timeout expeirec
         if self.time_left() < self.TIMER_THRESHOLD:
             raise SearchTimeout()
-        # we reached max depth
-        if depth == 0:
+        # we reached max depth or terminal state
+        if depth == 0 or self.terminal_test(game):
             return self.score(game, self)
-        # if terminal state, return player utility
-        if self.terminal_test(game):
-            return game.utility(self)
         # initialize value to worse score for MAX node
         v = float("-inf")
         for m in game.get_legal_moves():

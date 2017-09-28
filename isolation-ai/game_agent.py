@@ -106,7 +106,7 @@ def custom_score_2(game, player):
         if m not in edges:
             w2 += 1
 
-    return float(w1*player_moves - w2*opponent_moves)
+    return float(w1*player_moves - 2*w2*opponent_moves)
 
 def custom_score_3(game, player):
     """Calculate the heuristic value of a game state from the point of view
@@ -163,7 +163,7 @@ class IsolationPlayer:
         positive value large enough to allow the function to return before the
         timer expires.
     """
-    def __init__(self, search_depth=3, score_fn=custom_score, timeout=10.):
+    def __init__(self, search_depth=3, score_fn=custom_score, timeout=15.):
         self.search_depth = search_depth
         self.score = score_fn
         self.time_left = None

@@ -1,0 +1,16 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: isolation
+spec:
+  completions: 10
+  parallelism: 10
+  template:
+    metadata:
+      name: isolation-job
+    spec:
+      containers:
+      - name: isolation-container
+        image: gyre007/isolation
+        imagePullPolicy: Always
+      restartPolicy: OnFailure

@@ -1,0 +1,99 @@
+piVersion: v1
+kind: List
+items:
+  - apiVersion: batch/v1
+    kind: Job
+    metadata:
+      name: planning-p1-uninformed
+    spec:
+      completions: 1
+      template:
+        metadata:
+          name: planning-p1-uninformed
+        spec:
+          containers:
+          - name: p1-uninformed
+            image: gyre007/planning
+            args: ["-p", "1", "-s", "1", "3", "5"]
+            imagePullPolicy: Always
+          restartPolicy: OnFailure
+  - apiVersion: batch/v1
+    kind: Job
+    metadata:
+      name: planning-p2-uninformed
+    spec:
+      completions: 1
+      template:
+        metadata:
+          name: planning-p2-uninformed
+        spec:
+          containers:
+          - name: p2-uninformed
+            image: gyre007/planning
+            args: ["-p", "2", "-s", "1", "3", "5"]
+            imagePullPolicy: Always
+          restartPolicy: OnFailure
+  - apiVersion: batch/v1
+    kind: Job
+    metadata:
+      name: planning-p3-uninformed
+    spec:
+      completions: 1
+      template:
+        metadata:
+          name: planning-p3-uninformed
+        spec:
+          containers:
+          - name: p3-uninformed
+            image: gyre007/planning
+            args: ["-p", "3", "-s", "1", "3", "5"]
+            imagePullPolicy: Always
+          restartPolicy: OnFailure
+  - apiVersion: batch/v1
+    kind: Job
+    metadata:
+      name: planning-p1-informed
+    spec:
+      completions: 1
+      template:
+        metadata:
+          name: planning-p1-informed
+        spec:
+          containers:
+          - name: p1-informed
+            image: gyre007/planning
+            args: ["-p", "1", "-s", "8", "9", "10"]
+            imagePullPolicy: Always
+          restartPolicy: OnFailure
+  - apiVersion: batch/v1
+    kind: Job
+    metadata:
+      name: planning-p2-informed
+    spec:
+      completions: 1
+      template:
+        metadata:
+          name: planning-p2-informed
+        spec:
+          containers:
+          - name: p2-informed
+            image: gyre007/planning
+            args: ["-p", "2", "-s", "8", "9", "10"]
+            imagePullPolicy: Always
+          restartPolicy: OnFailure
+  - apiVersion: batch/v1
+    kind: Job
+    metadata:
+      name: planning-p3-informed
+    spec:
+      completions: 1
+      template:
+        metadata:
+          name: planning-p3-informed
+        spec:
+          containers:
+          - name: p3-informed
+            image: gyre007/planning
+            args: ["-p", "3", "-s", "8", "9", "10"]
+            imagePullPolicy: Always
+          restartPolicy: OnFailure

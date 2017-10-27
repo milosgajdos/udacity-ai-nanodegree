@@ -1,0 +1,6 @@
+*.json
+*.zip
+*.txt
+*.md
+images
+__pycache__

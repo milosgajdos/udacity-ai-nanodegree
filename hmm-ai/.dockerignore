@@ -1,0 +1,8 @@
+*.json
+*.zip
+*.txt
+*.md
+images
+Dockerfile
+.udacity-pa
+__pycache__
